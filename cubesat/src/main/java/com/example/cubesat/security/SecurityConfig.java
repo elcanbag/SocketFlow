@@ -38,7 +38,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/user/signup-with-cubesat").permitAll()
                         .requestMatchers("/api/user/register-cubesat").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers("/ws/cubesat/**").permitAll()
+                        .requestMatchers("/ws/device/**").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("index.html").permitAll()
                         .requestMatchers("index.html/**").permitAll()

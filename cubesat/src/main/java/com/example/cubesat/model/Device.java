@@ -1,16 +1,14 @@
 package com.example.cubesat.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import java.util.List;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "cubesats")
-public class CubeSat {
+@Table(name = "devices")
+public class Device {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,7 +19,7 @@ public class CubeSat {
     @Column(unique = true, nullable = false)
     private String accessToken;
 
-    @OneToMany(mappedBy = "cubeSat")
-    @JsonIgnore
-    private List<User> users;
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private User owner;
 }

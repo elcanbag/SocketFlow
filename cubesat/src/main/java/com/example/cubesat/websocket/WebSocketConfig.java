@@ -1,7 +1,8 @@
 package com.example.cubesat.websocket;
 
-import com.example.cubesat.repository.CubeSatRepository;
-import com.example.cubesat.service.CubeSatService;
+import com.example.cubesat.repository.DeviceRepository;
+import com.example.cubesat.repository.FieldRecordRepository;
+import com.example.cubesat.repository.FieldRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -13,12 +14,13 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketConfigurer {
 
-    private final CubeSatService cubeSatService;
-    private final CubeSatRepository cubeSatRepository;
+    private final DeviceRepository deviceRepository;
+    private final FieldRepository fieldRepository;
+    private final FieldRecordRepository fieldRecordRepository;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new CubeSatWebSocketHandler(cubeSatService, cubeSatRepository), "/ws/cubesat")
+        registry.addHandler(new DeviceWebSocketHandler(deviceRepository, fieldRepository, fieldRecordRepository), "/ws/device")
                 .setAllowedOrigins("*");
     }
 }
