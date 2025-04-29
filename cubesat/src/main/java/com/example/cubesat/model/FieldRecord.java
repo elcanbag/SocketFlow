@@ -15,6 +15,7 @@ public class FieldRecord {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "recorded_at")
     private LocalDateTime timestamp;
 
     @Column(name = "data_value")
