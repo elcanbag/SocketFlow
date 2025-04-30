@@ -4,8 +4,8 @@ import com.example.cubesat.model.Device;
 import com.example.cubesat.model.Field;
 import com.example.cubesat.model.FieldRecord;
 import com.example.cubesat.repository.DeviceRepository;
-import com.example.cubesat.repository.FieldRepository;
 import com.example.cubesat.repository.FieldRecordRepository;
+import com.example.cubesat.repository.FieldRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -18,6 +18,7 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 public class DeviceWebSocketHandler extends TextWebSocketHandler {
+
     private final DeviceRepository deviceRepository;
     private final FieldRepository fieldRepository;
     private final FieldRecordRepository fieldRecordRepository;
@@ -44,8 +45,8 @@ public class DeviceWebSocketHandler extends TextWebSocketHandler {
 
             FieldRecord record = new FieldRecord();
             record.setField(field);
+            record.setValue(Double.parseDouble(value));
             record.setTimestamp(LocalDateTime.now());
-            record.setValue(value);
 
             fieldRecordRepository.save(record);
         }
@@ -66,7 +67,6 @@ public class DeviceWebSocketHandler extends TextWebSocketHandler {
         }
         return map;
     }
-
 
     private Map<String, String> parseDataString(String data) {
         Map<String, String> map = new HashMap<>();

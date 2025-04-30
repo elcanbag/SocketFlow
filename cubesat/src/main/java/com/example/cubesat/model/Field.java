@@ -1,13 +1,18 @@
 package com.example.cubesat.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
 @Getter
 @Setter
-@Entity
-@Table(name = "fields")
 public class Field {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,6 +23,11 @@ public class Field {
     private String unit;
 
     @ManyToOne
-    @JoinColumn(name = "device_id", nullable = false)
     private Device device;
+
+    @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<FieldRecord> records = new ArrayList<>();
+
+
 }
