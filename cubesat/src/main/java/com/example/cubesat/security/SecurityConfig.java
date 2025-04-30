@@ -33,6 +33,7 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/user/signup").permitAll()
+                        .requestMatchers("/api/user/verify-account/**").permitAll()
                         .requestMatchers("/api/user/login/**").permitAll()
                         .requestMatchers("/api/user/logout").permitAll()
                         .requestMatchers("/api/user/signup-with-cubesat").permitAll()
@@ -57,25 +58,22 @@ public class SecurityConfig {
 
     @Bean
     public CorsFilter corsFilter() {
-        CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.setAllowedOriginPatterns(List.of("*"));
-
-        corsConfig.setAllowedMethods(List.of("*"));
-        corsConfig.setAllowedHeaders(List.of("*"));
-        corsConfig.setExposedHeaders(List.of("*"));
-        corsConfig.setAllowCredentials(true);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", corsConfig);
-        return new CorsFilter(source);
+        CorsConfiguration cfg = new CorsConfiguration();
+        cfg.setAllowedOriginPatterns(List.of("*"));
+        cfg.setAllowedMethods(List.of("*"));
+        cfg.setAllowedHeaders(List.of("*"));
+        cfg.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource src = new UrlBasedCorsConfigurationSource();
+        src.registerCorsConfiguration("/**", cfg);
+        return new CorsFilter(src);
     }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService());
-        provider.setPasswordEncoder(passwordEncoder());
-        return provider;
+        DaoAuthenticationProvider p = new DaoAuthenticationProvider();
+        p.setUserDetailsService(userDetailsService());
+        p.setPasswordEncoder(passwordEncoder());
+        return p;
     }
 
     @Bean
@@ -86,21 +84,25 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> {
-            Optional<User> user = userRepository.findByUsername(username);
-            if (user.isEmpty()) {
+            Optional<User> opt = userRepository.findByUsername(username);
+            if (opt.isEmpty()) {
                 throw new BadCredentialsException("User not found");
             }
+            User u = opt.get();
+            if (!u.isVerified()) {
+                throw new BadCredentialsException("Account not verified");
+            }
+            // Spring Security UserDetails örneği
             return org.springframework.security.core.userdetails.User
-                    .withUsername(user.get().getUsername())
-                    .password(user.get().getPassword())
+                    .withUsername(u.getUsername())
+                    .password(u.getPassword())
                     .roles("USER")
                     .build();
         };
     }
 
-
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance(); // No hashing
+        return NoOpPasswordEncoder.getInstance();
     }
 }

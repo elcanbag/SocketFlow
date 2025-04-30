@@ -5,10 +5,10 @@ import lombok.Getter;
 import lombok.Setter;
 import java.util.List;
 
-@Getter
-@Setter
 @Entity
 @Table(name = "users")
+@Getter
+@Setter
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,6 +19,15 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+
+    @Column(unique = true, nullable = false)
+    private String email;
+
+    @Column(name = "verification_code")
+    private String verificationCode;
+
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean verified;
 
     @OneToMany(mappedBy = "owner")
     private List<Device> devices;
