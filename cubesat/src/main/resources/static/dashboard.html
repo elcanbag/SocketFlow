@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Device Dashboard</title>
+</head>
+<body class="min-h-screen bg-gray-50 flex">
+
+  <aside class="w-64 bg-white shadow-md">
+    <div class="p-6 border-b">
+      <h2 class="text-2xl font-semibold">Dashboard</h2>
+    </div>
+    <nav class="p-4 space-y-2">
+      <button data-section="allDevices" class="w-full text-left px-4 py-2 rounded hover:bg-gray-100">See All Devices</button>
+      <button data-section="register"   class="w-full text-left px-4 py-2 rounded hover:bg-gray-100">Register Device</button>
+      <button data-section="latestData" class="w-full text-left px-4 py-2 rounded hover:bg-gray-100">Latest Data</button>
+      <button data-section="listFields" class="w-full text-left px-4 py-2 rounded hover:bg-gray-100">List Fields</button>
+      <button data-section="records"    class="w-full text-left px-4 py-2 rounded hover:bg-gray-100">Field Records</button>
+    </nav>
+  </aside>
+
+  <main class="flex-1 p-8 space-y-8 overflow-auto">
+    <!-- See All Devices -->
+    <div id="allDevices" class="space-y-4">
+      <h3 class="text-xl font-bold">All Devices</h3>
+      <button id="btnLoadDevices" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Load Devices</button>
+      <table class="w-full mt-4 table-auto border-collapse">
+        <thead>
+          <tr class="bg-gray-100">
+            <th class="px-4 py-2 border">ID</th>
+            <th class="px-4 py-2 border">Name</th>
+            <th class="px-4 py-2 border">Token</th>
+          </tr>
+        </thead>
+        <tbody id="devicesTable" class="bg-white"></tbody>
+      </table>
+    </div>
+
+    <!-- Register Device -->
+    <div id="register" class="space-y-4 hidden">
+      <h3 class="text-xl font-bold">Register New Device</h3>
+      <input id="deviceName" type="text" placeholder="Device Name" class="w-full px-4 py-2 border rounded"/>
+      <button id="btnRegister" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Register</button>
+      <div id="registerResult" class="text-green-600"></div>
+    </div>
+
+    <!-- Latest Data -->
+    <div id="latestData" class="space-y-4 hidden">
+      <h3 class="text-xl font-bold">Latest Data</h3>
+      <label class="block text-sm font-medium">Select Device</label>
+      <select id="latestSelectDevice" class="w-full px-4 py-2 border rounded"></select>
+      <button id="btnStartLatest" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Start Latest</button>
+      <table class="w-full mt-4 table-auto border-collapse">
+        <thead>
+          <tr class="bg-gray-100">
+            <th class="px-4 py-2 border">Field ID</th>
+            <th class="px-4 py-2 border">Value</th>
+            <th class="px-4 py-2 border">Timestamp</th>
+          </tr>
+        </thead>
+        <tbody id="latestTable" class="bg-white"></tbody>
+      </table>
+    </div>
+
+    <!-- List Fields -->
+    <div id="listFields" class="space-y-4 hidden">
+      <h3 class="text-xl font-bold">List Fields</h3>
+      <label class="block text-sm font-medium">Select Device</label>
+      <select id="listSelectDevice" class="w-full px-4 py-2 border rounded"></select>
+      <button id="btnStartListFields" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Start Fields</button>
+      <table class="w-full mt-4 table-auto border-collapse">
+        <thead>
+          <tr class="bg-gray-100">
+            <th class="px-4 py-2 border">ID</th>
+            <th class="px-4 py-2 border">Name</th>
+            <th class="px-4 py-2 border">Type</th>
+            <th class="px-4 py-2 border">Unit</th>
+          </tr>
+        </thead>
+        <tbody id="fieldsTable" class="bg-white"></tbody>
+      </table>
+    </div>
+
+    <!-- Field Records -->
+    <div id="records" class="space-y-4 hidden">
+      <h3 class="text-xl font-bold">Field Records</h3>
+      <label class="block text-sm font-medium">Select Device</label>
+      <select id="recordsSelectDevice" class="w-full px-4 py-2 border rounded"></select>
+      <input id="recordFieldId" type="number" placeholder="Field ID" class="w-full px-4 py-2 border rounded"/>
+      <div class="flex space-x-2">
+        <input id="startDate" type="datetime-local" class="flex-1 px-4 py-2 border rounded"/>
+        <input id="endDate"   type="datetime-local" class="flex-1 px-4 py-2 border rounded"/>
+      </div>
+      <button id="btnStartRecords" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Start Records</button>
+      <table class="w-full mt-4 table-auto border-collapse">
+        <thead>
+          <tr class="bg-gray-100">
+            <th class="px-4 py-2 border">Value</th>
+            <th class="px-4 py-2 border">Timestamp</th>
+          </tr>
+        </thead>
+        <tbody id="recordsTable" class="bg-white"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const BASE = 'http://localhost';
+      let devices = [];
+      const intervals = {};
+
+      function getAuthHeader() {
+        const auth = sessionStorage.getItem('auth');
+        if (!auth) throw new Error('Not authenticated');
+        return { 'Authorization': `Basic ${auth}` };
+      }
+
+      async function fetchJson(path, opts = {}) {
+        opts.headers = { ...(opts.headers||{}), ...getAuthHeader() };
+        const res = await fetch(BASE + path, opts);
+        if (!res.ok) throw new Error(await res.text());
+        return res.json();
+      }
+
+      async function loadDevices() {
+        devices = await fetchJson('/api/device/all');
+        document.querySelectorAll('select').forEach(sel => {
+          sel.innerHTML = devices.map(d =>
+            `<option value="${d.accessToken}">${d.name} (${d.id})</option>`
+          ).join('');
+        });
+        renderDevicesTable();
+      }
+
+      function clearIntervalKey(key) {
+        if (intervals[key]) clearInterval(intervals[key]);
+      }
+
+      function startPolling(key, fn) {
+        clearIntervalKey(key);
+        fn();
+        intervals[key] = setInterval(fn, 3000);
+      }
+
+      function renderDevicesTable() {
+        const tbody = document.getElementById('devicesTable');
+        tbody.innerHTML = devices.map(d =>
+          `<tr>
+            <td class="px-4 py-2 border">${d.id}</td>
+            <td class="px-4 py-2 border">${d.name}</td>
+            <td class="px-4 py-2 border">${d.accessToken}</td>
+          </tr>`).join('');
+      }
+
+      // Navigation
+      document.querySelectorAll('aside button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('main > div').forEach(s => s.classList.add('hidden'));
+          document.getElementById(btn.dataset.section).classList.remove('hidden');
+        });
+      });
+
+      // See All Devices
+      document.getElementById('btnLoadDevices').addEventListener('click', () => {
+        startPolling('devices', loadDevices);
+      });
+
+      // Register
+      document.getElementById('btnRegister').addEventListener('click', async () => {
+        const name = document.getElementById('deviceName').value.trim();
+        const json = await fetchJson('/api/device/register', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ deviceName: name })
+        });
+        document.getElementById('registerResult').textContent = `Token: ${json.accessToken}`;
+        await loadDevices();
+      });
+
+      // Latest Data
+      document.getElementById('btnStartLatest').addEventListener('click', () => {
+        startPolling('latest', async () => {
+          const token = document.getElementById('latestSelectDevice').value;
+          const data  = await fetchJson(`/devices/${token}/fields/latest`);
+          document.getElementById('latestTable').innerHTML = data.map(r =>
+            `<tr>
+              <td class="px-4 py-2 border">${r.fieldId}</td>
+              <td class="px-4 py-2 border">${r.value}</td>
+              <td class="px-4 py-2 border">${r.timestamp}</td>
+            </tr>`).join('');
+        });
+      });
+
+      // List Fields
+      document.getElementById('btnStartListFields').addEventListener('click', () => {
+        startPolling('fields', async () => {
+          const token = document.getElementById('listSelectDevice').value;
+          const list  = await fetchJson(`/devices/${token}/fields`);
+          document.getElementById('fieldsTable').innerHTML = list.map(f =>
+            `<tr>
+              <td class="px-4 py-2 border">${f.id}</td>
+              <td class="px-4 py-2 border">${f.name}</td>
+              <td class="px-4 py-2 border">${f.type}</td>
+              <td class="px-4 py-2 border">${f.unit}</td>
+            </tr>`).join('');
+        });
+      });
+
+      // Field Records
+      document.getElementById('btnStartRecords').addEventListener('click', () => {
+        startPolling('records', async () => {
+          const token   = document.getElementById('recordsSelectDevice').value;
+          const fieldId = document.getElementById('recordFieldId').value;
+          const start   = document.getElementById('startDate').value;
+          const end     = document.getElementById('endDate').value;
+          let path = `/devices/${token}/fields/${fieldId}/records`;
+          if (start && end) path += `?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`;
+          const recs = await fetchJson(path);
+          document.getElementById('recordsTable').innerHTML = recs.map(r =>
+            `<tr>
+              <td class="px-4 py-2 border">${r.value}</td>
+              <td class="px-4 py-2 border">${r.timestamp}</td>
+            </tr>`).join('');
+        });
+      });
+
+      // Initialize
+      loadDevices();
+    });
+  </script>
+</body>
+</html>
