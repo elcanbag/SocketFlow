@@ -1,6 +1,6 @@
 
 INSERT INTO users (username, password, email, verification_code, verified)
-VALUES ('testuser', 'testpassword', 'test@example.com', 888576, TRUE);
+VALUES ('testuser', 'testpassword', 'elcanbaa@proton.me', 888576, TRUE);
 
 
 INSERT INTO devices (access_token, name, owner_id)

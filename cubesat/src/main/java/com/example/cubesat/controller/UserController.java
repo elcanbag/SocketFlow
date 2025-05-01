@@ -35,12 +35,12 @@ public class UserController {
         user.setEmail(email);
         user.setVerified(false);
 
-        // Doğrulama kodu oluşturup sakla
+
         String code = userService.generateVerificationCode();
         user.setVerificationCode(code);
         userRepository.save(user);
 
-        // E-postayı gönder
+
         userService.sendVerificationEmail(email, code);
 
         return ResponseEntity.ok(Map.of(
@@ -83,4 +83,24 @@ public class UserController {
 
         return ResponseEntity.ok(Map.of("message", "Login successful"));
     }
+
+
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        userService.createPasswordResetToken(email);
+        return ResponseEntity.ok(Map.of("message", "E-posta gönderildi"));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(
+            @RequestParam String token,
+            @RequestBody Map<String, String> payload
+    ) {
+        String newPassword = payload.get("password");
+        userService.resetPassword(token, newPassword);
+        return ResponseEntity.ok(Map.of("message", "Password reset"));
+    }
+
 }
