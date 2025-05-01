@@ -16,4 +16,8 @@ public interface FieldRecordRepository extends JpaRepository<FieldRecord, Long> 
     List<FieldRecord> findByFieldOrderByTimestampAsc(Field field);
 
     List<FieldRecord> findByFieldAndTimestampBetweenOrderByTimestampAsc(Field field, LocalDateTime start, LocalDateTime end);
+
+    List<FieldRecord> findByFieldDeviceId(Long deviceId);
+
+
 }
