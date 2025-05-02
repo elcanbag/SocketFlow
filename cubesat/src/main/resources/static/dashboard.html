@@ -49,13 +49,13 @@
 
     <div id="latestData" class="space-y-4 hidden">
       <h3 class="text-xl font-bold">Latest Data</h3>
-      <label class="block text-sm font-medium">Select Device</label>
       <select id="latestSelectDevice" class="w-full px-4 py-2 border rounded"></select>
       <button id="btnStartLatest" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Start Latest</button>
       <table class="w-full mt-4 table-auto border-collapse">
         <thead>
           <tr class="bg-gray-100">
             <th class="px-4 py-2 border">Field ID</th>
+            <th class="px-4 py-2 border">Field Name</th>
             <th class="px-4 py-2 border">Value</th>
             <th class="px-4 py-2 border">Timestamp</th>
           </tr>
@@ -66,7 +66,6 @@
 
     <div id="listFields" class="space-y-4 hidden">
       <h3 class="text-xl font-bold">List Fields</h3>
-      <label class="block text-sm font-medium">Select Device</label>
       <select id="listSelectDevice" class="w-full px-4 py-2 border rounded"></select>
       <button id="btnStartListFields" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Start Fields</button>
       <table class="w-full mt-4 table-auto border-collapse">
@@ -84,12 +83,11 @@
 
     <div id="records" class="space-y-4 hidden">
       <h3 class="text-xl font-bold">Field Records</h3>
-      <label class="block text-sm font-medium">Select Device</label>
       <select id="recordsSelectDevice" class="w-full px-4 py-2 border rounded"></select>
-      <input id="recordFieldId" type="number" placeholder="Field ID" class="w-full px-4 py-2 border rounded"/>
+      <select id="recordFieldSelect" class="w-full px-4 py-2 border rounded"></select>
       <div class="flex space-x-2">
         <input id="startDate" type="datetime-local" class="flex-1 px-4 py-2 border rounded"/>
-        <input id="endDate" type="datetime-local" class="flex-1 px-4 py-2 border rounded"/>
+        <input id="endDate"   type="datetime-local" class="flex-1 px-4 py-2 border rounded"/>
       </div>
       <button id="btnStartRecords" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Start Records</button>
       <table class="w-full mt-4 table-auto border-collapse">
@@ -135,7 +133,7 @@
 
       async function loadDevices() {
         devices = await fetchJson('/api/device/all');
-        document.querySelectorAll('select').forEach(sel => {
+        document.querySelectorAll('select[id$="SelectDevice"]').forEach(sel => {
           sel.innerHTML = devices.map(d =>
             `<option value="${d.accessToken}">${d.name} (${d.id})</option>`
           ).join('');
@@ -146,6 +144,16 @@
             <td class="px-4 py-2 border">${d.name}</td>
             <td class="px-4 py-2 border">${d.accessToken}</td>
           </tr>`
+        ).join('');
+        // populate fields dropdown for records
+        await loadRecordFields();
+      }
+
+      async function loadRecordFields() {
+        const token = document.getElementById('recordsSelectDevice').value;
+        const fields = await fetchJson(`/devices/${token}/fields`);
+        document.getElementById('recordFieldSelect').innerHTML = fields.map(f =>
+          `<option value="${f.id}">${f.name}</option>`
         ).join('');
       }
 
@@ -184,10 +192,13 @@
       document.getElementById('btnStartLatest').addEventListener('click', () => {
         startPolling('latest', async () => {
           const token = document.getElementById('latestSelectDevice').value;
+          const fields = await fetchJson(`/devices/${token}/fields`);
+          const map = Object.fromEntries(fields.map(f => [f.id, f.name]));
           const data  = await fetchJson(`/devices/${token}/fields/latest`);
           document.getElementById('latestTable').innerHTML = data.map(r =>
             `<tr>
               <td class="px-4 py-2 border">${r.fieldId}</td>
+              <td class="px-4 py-2 border">${map[r.fieldId]}</td>
               <td class="px-4 py-2 border">${r.dataValue}</td>
               <td class="px-4 py-2 border">${r.timestamp}</td>
             </tr>`
@@ -210,10 +221,12 @@
         });
       });
 
+      document.getElementById('recordsSelectDevice').addEventListener('change', loadRecordFields);
+
       document.getElementById('btnStartRecords').addEventListener('click', () => {
         startPolling('records', async () => {
           const token   = document.getElementById('recordsSelectDevice').value;
-          const fieldId = document.getElementById('recordFieldId').value;
+          const fieldId = document.getElementById('recordFieldSelect').value;
           const start   = document.getElementById('startDate').value;
           const end     = document.getElementById('endDate').value;
           let path = `/devices/${token}/fields/${fieldId}/records`;
