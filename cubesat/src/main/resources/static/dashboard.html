@@ -6,7 +6,11 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <title>SocketFlow Dashboard</title>
 </head>
-<body class="min-h-screen bg-gray-50 flex">
+<body class="min-h-screen bg-gray-50 flex relative">
+  <div class="absolute top-4 right-6 flex items-center space-x-4 text-lg">
+    <span id="username" class="font-semibold"></span>
+    <a href="#" id="logout" class="text-red-600 hover:text-red-800">Logout</a>
+  </div>
   <aside class="w-64 bg-white shadow-md">
     <div class="p-6 border-b">
       <h2 class="text-2xl font-semibold">SocketFlow</h2>
@@ -105,6 +109,16 @@
       const BASE = 'http://localhost';
       let devices = [];
       const intervals = {};
+
+      const logoutBtn = document.getElementById('logout');
+      const userSpan = document.getElementById('username');
+      const auth = sessionStorage.getItem('auth') || '';
+      const user = atob(auth).split(':')[0] || '';
+      userSpan.textContent = user;
+      logoutBtn.addEventListener('click', () => {
+        sessionStorage.removeItem('auth');
+        location.reload();
+      });
 
       function getAuthHeader() {
         const auth = sessionStorage.getItem('auth');
