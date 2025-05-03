@@ -20,16 +20,24 @@
       <button data-section="records"    class="w-full text-left px-4 py-2 rounded hover:bg-gray-100">Field Records</button>
       <a href="charts.html" class="block px-4 py-2 rounded hover:bg-gray-100">Chart</a>
       <a href="export.html" class="block px-4 py-2 rounded hover:bg-gray-100">Export</a>
-      <a href="about.html"    class="block px-4 py-2 rounded hover:bg-gray-100">About Us</a>
+      <a href="about.html"  class="block px-4 py-2 rounded hover:bg-gray-100">About Us</a>
     </nav>
   </aside>
 
   <!-- Content + Footer wrapper -->
   <div class="flex-1 flex flex-col">
-    <!-- Top bar -->
-    <header class="flex justify-end items-center p-6 border-b bg-white">
-      <span id="username" class="font-semibold mr-4"></span>
-      <a href="#" id="logout" class="text-red-600 hover:text-red-800">Logout</a>
+    <!-- Top bar with centered nav -->
+    <header class="flex items-center p-6 border-b bg-white">
+      <div class="flex-1 flex justify-center space-x-8">
+        
+        <a href="devs/developers.html" class="text-gray-700 hover:text-indigo-600">For Developers</a>
+        <a href="edu/education.html" class="text-gray-700 hover:text-indigo-600">Education</a>
+        <a href="devs/env/env.html" class="text-gray-700 hover:text-indigo-600">Download SocketFlow Dev Environment</a>
+      </div>
+      <div class="flex items-center space-x-4">
+        <span id="username" class="font-semibold"></span>
+        <a href="#" id="logout" class="text-red-600 hover:text-red-800">Logout</a>
+      </div>
     </header>
 
     <!-- Main content -->
@@ -142,38 +150,38 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const BASE = 'http://localhost';
-      let intervals = [], devices = [];
+      let intervals = {}, devices = [];
 
+      // user + logout
       const logoutBtn = document.getElementById('logout');
       const userSpan  = document.getElementById('username');
-      const auth      = sessionStorage.getItem('auth') || '';
-      userSpan.textContent = atob(auth).split(':')[0] || '';
+      const auth      = sessionStorage.getItem('auth')||'';
+      userSpan.textContent = atob(auth).split(':')[0]||'';
       logoutBtn.addEventListener('click', () => {
         sessionStorage.removeItem('auth');
         location.reload();
       });
 
-      function getAuthHeader() {
+      function getAuthHeader(){
         const a = sessionStorage.getItem('auth');
-        if (!a) throw new Error('Not authenticated');
-        return { 'Authorization': `Basic ${a}` };
+        if(!a) throw new Error('Not authenticated');
+        return {'Authorization': `Basic ${a}`};
       }
-
-      async function fetchJson(path, opts = {}) {
-        opts.headers = { ...(opts.headers||{}), ...getAuthHeader() };
-        const res = await fetch(BASE + path, opts);
-        if (!res.ok) throw new Error(await res.text());
+      async function fetchJson(path, opts={}){
+        opts.headers = {...(opts.headers||{}), ...getAuthHeader()};
+        const res = await fetch(BASE+path, opts);
+        if(!res.ok) throw new Error(await res.text());
         return res.json();
       }
 
-      async function loadDevices() {
+      async function loadDevices(){
         devices = await fetchJson('/api/device/all');
-        document.querySelectorAll('select[id$="SelectDevice"]').forEach(sel => {
-          sel.innerHTML = devices.map(d =>
+        document.querySelectorAll('select[id$="SelectDevice"]').forEach(sel=>{
+          sel.innerHTML = devices.map(d=>
             `<option value="${d.accessToken}">${d.name} (${d.id})</option>`
           ).join('');
         });
-        document.getElementById('devicesTable').innerHTML = devices.map(d =>
+        document.getElementById('devicesTable').innerHTML = devices.map(d=>
           `<tr>
              <td class="px-4 py-2 border">${d.id}</td>
              <td class="px-4 py-2 border">${d.name}</td>
@@ -182,38 +190,34 @@
         ).join('');
         await loadRecordFields();
       }
-
-      async function loadRecordFields() {
+      async function loadRecordFields(){
         const token = document.getElementById('recordsSelectDevice').value;
-        const fields = await fetchJson(`/devices/${token}/fields`);
-        document.getElementById('recordFieldSelect').innerHTML = fields.map(f =>
+        const fields= await fetchJson(`/devices/${token}/fields`);
+        document.getElementById('recordFieldSelect').innerHTML = fields.map(f=>
           `<option value="${f.id}">${f.name}</option>`
         ).join('');
       }
 
-      function clearInterval(key) {
-        if (intervals[key]) clearInterval(intervals[key]);
+      function clearIntervalKey(k){
+        if(intervals[k]) clearInterval(intervals[k]);
       }
-      function startPolling(key, fn) {
-        clearInterval(key);
+      function startPolling(key,fn){
+        clearIntervalKey(key);
         fn();
-        intervals[key] = setInterval(fn, 3000);
+        intervals[key] = setInterval(fn,3000);
       }
 
-      document.querySelectorAll('aside button').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+      document.querySelectorAll('aside button').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          document.querySelectorAll('main > section').forEach(s=>s.classList.add('hidden'));
           document.getElementById(btn.dataset.section).classList.remove('hidden');
         });
       });
 
-      document.getElementById('btnLoadDevices').addEventListener('click', () =>
-        startPolling('devices', loadDevices)
-      );
-
-      document.getElementById('btnRegister').addEventListener('click', async () => {
+      document.getElementById('btnLoadDevices').addEventListener('click',()=> startPolling('devices', loadDevices));
+      document.getElementById('btnRegister').addEventListener('click', async ()=>{
         const name = document.getElementById('deviceName').value.trim();
-        const json = await fetchJson('/api/device/register', {
+        const json = await fetchJson('/api/device/register',{
           method:'POST',
           headers:{'Content-Type':'application/json'},
           body:JSON.stringify({deviceName:name})
@@ -221,58 +225,48 @@
         document.getElementById('registerResult').textContent = `Token: ${json.accessToken}`;
         await loadDevices();
       });
-
-      document.getElementById('btnStartLatest').addEventListener('click', () =>
-        startPolling('latest', async () => {
-          const token  = document.getElementById('latestSelectDevice').value;
-          const fields = await fetchJson(`/devices/${token}/fields`);
-          const map    = Object.fromEntries(fields.map(f=>[f.id,f.name]));
-          const data   = await fetchJson(`/devices/${token}/fields/latest`);
-          document.getElementById('latestTable').innerHTML = data.map(r =>
-            `<tr>
-               <td class="px-4 py-2 border">${r.fieldId}</td>
-               <td class="px-4 py-2 border">${map[r.fieldId]}</td>
-               <td class="px-4 py-2 border">${r.dataValue}</td>
-               <td class="px-4 py-2 border">${r.timestamp}</td>
-             </tr>`
-          ).join('');
-        })
-      );
-
-      document.getElementById('btnStartListFields').addEventListener('click', () =>
-        startPolling('fields', async () => {
-          const token = document.getElementById('listSelectDevice').value;
-          const list  = await fetchJson(`/devices/${token}/fields`);
-          document.getElementById('fieldsTable').innerHTML = list.map(f =>
-            `<tr>
-               <td class="px-4 py-2 border">${f.id}</td>
-               <td class="px-4 py-2 border">${f.name}</td>
-               <td class="px-4 py-2 border">${f.type}</td>
-               <td class="px-4 py-2 border">${f.unit}</td>
-             </tr>`
-          ).join('');
-        })
-      );
-
+      document.getElementById('btnStartLatest').addEventListener('click', ()=> startPolling('latest', async ()=>{
+        const token= document.getElementById('latestSelectDevice').value;
+        const fields= await fetchJson(`/devices/${token}/fields`);
+        const map = Object.fromEntries(fields.map(f=>[f.id,f.name]));
+        const data = await fetchJson(`/devices/${token}/fields/latest`);
+        document.getElementById('latestTable').innerHTML = data.map(r=>
+          `<tr>
+             <td class="px-4 py-2 border">${r.fieldId}</td>
+             <td class="px-4 py-2 border">${map[r.fieldId]}</td>
+             <td class="px-4 py-2 border">${r.dataValue}</td>
+             <td class="px-4 py-2 border">${r.timestamp}</td>
+           </tr>`
+        ).join('');
+      }));
+      document.getElementById('btnStartListFields').addEventListener('click', ()=> startPolling('fields', async ()=>{
+        const token = document.getElementById('listSelectDevice').value;
+        const list  = await fetchJson(`/devices/${token}/fields`);
+        document.getElementById('fieldsTable').innerHTML = list.map(f=>
+          `<tr>
+             <td class="px-4 py-2 border">${f.id}</td>
+             <td class="px-4 py-2 border">${f.name}</td>
+             <td class="px-4 py-2 border">${f.type}</td>
+             <td class="px-4 py-2 border">${f.unit}</td>
+           </tr>`
+        ).join('');
+      }));
       document.getElementById('recordsSelectDevice').addEventListener('change', loadRecordFields);
-
-      document.getElementById('btnStartRecords').addEventListener('click', () =>
-        startPolling('records', async () => {
-          const token   = document.getElementById('recordsSelectDevice').value;
-          const fieldId = document.getElementById('recordFieldSelect').value;
-          let   path    = `/devices/${token}/fields/${fieldId}/records`;
-          const start   = document.getElementById('startDate').value;
-          const end     = document.getElementById('endDate').value;
-          if (start && end) path += `?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`;
-          const recs    = await fetchJson(path);
-          document.getElementById('recordsTable').innerHTML = recs.map(r =>
-            `<tr>
-               <td class="px-4 py-2 border">${r.dataValue}</td>
-               <td class="px-4 py-2 border">${r.timestamp}</td>
-             </tr>`
-          ).join('');
-        })
-      );
+      document.getElementById('btnStartRecords').addEventListener('click', ()=> startPolling('records', async ()=>{
+        const token = document.getElementById('recordsSelectDevice').value;
+        const fieldId = document.getElementById('recordFieldSelect').value;
+        let path = `/devices/${token}/fields/${fieldId}/records`;
+        const s = document.getElementById('startDate').value;
+        const e = document.getElementById('endDate').value;
+        if(s&&e) path += `?start=${encodeURIComponent(s)}&end=${encodeURIComponent(e)}`;
+        const recs = await fetchJson(path);
+        document.getElementById('recordsTable').innerHTML = recs.map(r=>
+          `<tr>
+             <td class="px-4 py-2 border">${r.dataValue}</td>
+             <td class="px-4 py-2 border">${r.timestamp}</td>
+           </tr>`
+        ).join('');
+      }));
 
       loadDevices();
     });
