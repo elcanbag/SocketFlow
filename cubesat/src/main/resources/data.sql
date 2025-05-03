@@ -1,4 +1,4 @@
--- TEK USER
+
 INSERT INTO users (username, password, email, verification_code, verified) VALUES
     ('testuser', 'testpassword', 'elcanbaa@proton.me', 888576, TRUE);
 
