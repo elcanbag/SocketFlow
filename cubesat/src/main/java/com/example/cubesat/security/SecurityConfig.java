@@ -54,6 +54,15 @@ public class SecurityConfig {
                         .requestMatchers("about.html").permitAll()
                         .requestMatchers("devs/**").permitAll()
                         .requestMatchers("edu/**").permitAll()
+                        .requestMatchers("/",
+                                "/index.html",
+                                "/dashboard.html", "/dashboard.html/**",
+                                "/export.html",    "/export.html/**",
+                                "/charts.html",    "/charts.html/**",
+                                "/about.html",     "/about.html/**")
+                        .permitAll()
+                        .requestMatchers("/devs/**", "/edu/**")
+                        .permitAll()
 
                         .requestMatchers("/").permitAll()
                         .requestMatchers("index.html/**").permitAll()
