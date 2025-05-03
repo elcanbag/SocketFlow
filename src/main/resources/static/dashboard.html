@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>SocketFlow Dashboard</title>
+</head>
+<body class="flex min-h-screen bg-gray-50">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white shadow-md h-screen sticky top-0">
+    <div class="p-6 border-b">
+      <h2 class="text-2xl font-semibold">SocketFlow</h2>
+    </div>
+    <nav class="p-4 space-y-2">
+      <button data-section="allDevices" class="w-full text-left px-4 py-2 rounded hover:bg-gray-100">See All Devices</button>
+      <button data-section="register"   class="w-full text-left px-4 py-2 rounded hover:bg-gray-100">Register Device</button>
+      <button data-section="latestData" class="w-full text-left px-4 py-2 rounded hover:bg-gray-100">Latest Data</button>
+      <button data-section="listFields" class="w-full text-left px-4 py-2 rounded hover:bg-gray-100">List Fields</button>
+      <button data-section="records"    class="w-full text-left px-4 py-2 rounded hover:bg-gray-100">Field Records</button>
+      <a href="charts.html" class="block px-4 py-2 rounded hover:bg-gray-100">Chart</a>
+      <a href="export.html" class="block px-4 py-2 rounded hover:bg-gray-100">Export</a>
+      <a href="devs/developers.html" class="block px-4 py-2 rounded hover:bg-gray-100">Developers</a>
+      <a href="about.html"  class="block px-4 py-2 rounded hover:bg-gray-100">About Us</a>
+
+    </nav>
+  </aside>
+
+  <!-- Content + Footer wrapper -->
+  <div class="flex-1 flex flex-col">
+    <!-- Top bar with centered nav -->
+    <header class="flex items-center p-6 border-b bg-white">
+      <div class="flex-1 flex justify-center space-x-8">
+        
+        <a href="devs/developers.html" class="text-gray-700 hover:text-indigo-600">For Developers</a>
+        <a href="edu/education.html" class="text-gray-700 hover:text-indigo-600">Education</a>
+        <a href="devs/env/env.html" class="text-gray-700 hover:text-indigo-600">Download SocketFlow Dev Environment</a>
+      </div>
+      <div class="flex items-center space-x-4">
+        <span id="username" class="font-semibold"></span>
+        <a href="#" id="logout" class="text-red-600 hover:text-red-800">Logout</a>
+      </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="flex-1 p-8 overflow-auto">
+      <!-- All Devices -->
+      <section id="allDevices" class="space-y-4">
+        <h3 class="text-xl font-bold">All Devices</h3>
+        <button id="btnLoadDevices" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Load Devices</button>
+        <table class="w-full mt-4 table-auto border-collapse">
+          <thead>
+            <tr class="bg-gray-100">
+              <th class="px-4 py-2 border">ID</th>
+              <th class="px-4 py-2 border">Name</th>
+              <th class="px-4 py-2 border">Token</th>
+            </tr>
+          </thead>
+          <tbody id="devicesTable" class="bg-white"></tbody>
+        </table>
+      </section>
+
+      <!-- Register -->
+      <section id="register" class="space-y-4 hidden">
+        <h3 class="text-xl font-bold">Register Device</h3>
+        <input id="deviceName" type="text" placeholder="Device Name" class="w-full px-4 py-2 border rounded"/>
+        <button id="btnRegister" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Register</button>
+        <div id="registerResult" class="text-green-600"></div>
+      </section>
+
+      <!-- Latest Data -->
+      <section id="latestData" class="space-y-4 hidden">
+        <h3 class="text-xl font-bold">Latest Data</h3>
+        <select id="latestSelectDevice" class="w-full px-4 py-2 border rounded"></select>
+        <button id="btnStartLatest" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Start Latest</button>
+        <table class="w-full mt-4 table-auto border-collapse">
+          <thead>
+            <tr class="bg-gray-100">
+              <th class="px-4 py-2 border">Field ID</th>
+              <th class="px-4 py-2 border">Field Name</th>
+              <th class="px-4 py-2 border">Value</th>
+              <th class="px-4 py-2 border">Timestamp</th>
+            </tr>
+          </thead>
+          <tbody id="latestTable" class="bg-white"></tbody>
+        </table>
+      </section>
+
+      <!-- List Fields -->
+      <section id="listFields" class="space-y-4 hidden">
+        <h3 class="text-xl font-bold">List Fields</h3>
+        <select id="listSelectDevice" class="w-full px-4 py-2 border rounded"></select>
+        <button id="btnStartListFields" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Start Fields</button>
+        <table class="w-full mt-4 table-auto border-collapse">
+          <thead>
+            <tr class="bg-gray-100">
+              <th class="px-4 py-2 border">ID</th>
+              <th class="px-4 py-2 border">Name</th>
+              <th class="px-4 py-2 border">Type</th>
+              <th class="px-4 py-2 border">Unit</th>
+            </tr>
+          </thead>
+          <tbody id="fieldsTable" class="bg-white"></tbody>
+        </table>
+      </section>
+
+      <!-- Field Records -->
+      <section id="records" class="space-y-4 hidden">
+        <h3 class="text-xl font-bold">Field Records</h3>
+        <select id="recordsSelectDevice" class="w-full px-4 py-2 border rounded"></select>
+        <select id="recordFieldSelect"   class="w-full px-4 py-2 border rounded"></select>
+        <div class="flex space-x-2">
+          <input id="startDate" type="datetime-local" class="flex-1 px-4 py-2 border rounded"/>
+          <input id="endDate"   type="datetime-local" class="flex-1 px-4 py-2 border rounded"/>
+        </div>
+        <button id="btnStartRecords" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Start Records</button>
+        <table class="w-full mt-4 table-auto border-collapse">
+          <thead>
+            <tr class="bg-gray-100">
+              <th class="px-4 py-2 border">Value</th>
+              <th class="px-4 py-2 border">Timestamp</th>
+            </tr>
+          </thead>
+          <tbody id="recordsTable" class="bg-white"></tbody>
+        </table>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t p-6">
+      <div class="max-w-4xl mx-auto grid grid-cols-4 gap-8 text-center">
+        <div>
+          <h4 class="font-semibold mb-2">About Us</h4>
+          <p><a href="about.html" class="text-blue-600 hover:underline">Learn more about SocketFlow</a></p>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-2">Contacts</h4>
+          <p>Email: <a href="mailto:info@xjyj.site" class="text-blue-600 hover:underline">info@xjyj.site</a></p>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-2">Legal</h4>
+          <p><a href="#" class="text-blue-600 hover:underline">Privacy Policy</a></p>
+          <p><a href="#" class="text-blue-600 hover:underline">Terms of Service</a></p>
+        </div>
+        <div class="flex items-center justify-center">
+          <p class="text-sm text-gray-500">Powered by SocketFlow team</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const BASE = 'http://localhost';
+      let intervals = {}, devices = [];
+
+      // user + logout
+      const logoutBtn = document.getElementById('logout');
+      const userSpan  = document.getElementById('username');
+      const auth      = sessionStorage.getItem('auth')||'';
+      userSpan.textContent = atob(auth).split(':')[0]||'';
+      logoutBtn.addEventListener('click', () => {
+        sessionStorage.removeItem('auth');
+        location.reload();
+      });
+
+      function getAuthHeader(){
+        const a = sessionStorage.getItem('auth');
+        if(!a) throw new Error('Not authenticated');
+        return {'Authorization': `Basic ${a}`};
+      }
+      async function fetchJson(path, opts={}){
+        opts.headers = {...(opts.headers||{}), ...getAuthHeader()};
+        const res = await fetch(BASE+path, opts);
+        if(!res.ok) throw new Error(await res.text());
+        return res.json();
+      }
+
+      async function loadDevices(){
+        devices = await fetchJson('/api/device/all');
+        document.querySelectorAll('select[id$="SelectDevice"]').forEach(sel=>{
+          sel.innerHTML = devices.map(d=>
+            `<option value="${d.accessToken}">${d.name} (${d.id})</option>`
+          ).join('');
+        });
+        document.getElementById('devicesTable').innerHTML = devices.map(d=>
+          `<tr>
+             <td class="px-4 py-2 border">${d.id}</td>
+             <td class="px-4 py-2 border">${d.name}</td>
+             <td class="px-4 py-2 border">${d.accessToken}</td>
+           </tr>`
+        ).join('');
+        await loadRecordFields();
+      }
+      async function loadRecordFields(){
+        const token = document.getElementById('recordsSelectDevice').value;
+        const fields= await fetchJson(`/devices/${token}/fields`);
+        document.getElementById('recordFieldSelect').innerHTML = fields.map(f=>
+          `<option value="${f.id}">${f.name}</option>`
+        ).join('');
+      }
+
+      function clearIntervalKey(k){
+        if(intervals[k]) clearInterval(intervals[k]);
+      }
+      function startPolling(key,fn){
+        clearIntervalKey(key);
+        fn();
+        intervals[key] = setInterval(fn,3000);
+      }
+
+      document.querySelectorAll('aside button').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          document.querySelectorAll('main > section').forEach(s=>s.classList.add('hidden'));
+          document.getElementById(btn.dataset.section).classList.remove('hidden');
+        });
+      });
+
+      document.getElementById('btnLoadDevices').addEventListener('click',()=> startPolling('devices', loadDevices));
+      document.getElementById('btnRegister').addEventListener('click', async ()=>{
+        const name = document.getElementById('deviceName').value.trim();
+        const json = await fetchJson('/api/device/register',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({deviceName:name})
+        });
+        document.getElementById('registerResult').textContent = `Token: ${json.accessToken}`;
+        await loadDevices();
+      });
+      document.getElementById('btnStartLatest').addEventListener('click', ()=> startPolling('latest', async ()=>{
+        const token= document.getElementById('latestSelectDevice').value;
+        const fields= await fetchJson(`/devices/${token}/fields`);
+        const map = Object.fromEntries(fields.map(f=>[f.id,f.name]));
+        const data = await fetchJson(`/devices/${token}/fields/latest`);
+        document.getElementById('latestTable').innerHTML = data.map(r=>
+          `<tr>
+             <td class="px-4 py-2 border">${r.fieldId}</td>
+             <td class="px-4 py-2 border">${map[r.fieldId]}</td>
+             <td class="px-4 py-2 border">${r.dataValue}</td>
+             <td class="px-4 py-2 border">${r.timestamp}</td>
+           </tr>`
+        ).join('');
+      }));
+      document.getElementById('btnStartListFields').addEventListener('click', ()=> startPolling('fields', async ()=>{
+        const token = document.getElementById('listSelectDevice').value;
+        const list  = await fetchJson(`/devices/${token}/fields`);
+        document.getElementById('fieldsTable').innerHTML = list.map(f=>
+          `<tr>
+             <td class="px-4 py-2 border">${f.id}</td>
+             <td class="px-4 py-2 border">${f.name}</td>
+             <td class="px-4 py-2 border">${f.type}</td>
+             <td class="px-4 py-2 border">${f.unit}</td>
+           </tr>`
+        ).join('');
+      }));
+      document.getElementById('recordsSelectDevice').addEventListener('change', loadRecordFields);
+      document.getElementById('btnStartRecords').addEventListener('click', ()=> startPolling('records', async ()=>{
+        const token = document.getElementById('recordsSelectDevice').value;
+        const fieldId = document.getElementById('recordFieldSelect').value;
+        let path = `/devices/${token}/fields/${fieldId}/records`;
+        const s = document.getElementById('startDate').value;
+        const e = document.getElementById('endDate').value;
+        if(s&&e) path += `?start=${encodeURIComponent(s)}&end=${encodeURIComponent(e)}`;
+        const recs = await fetchJson(path);
+        document.getElementById('recordsTable').innerHTML = recs.map(r=>
+          `<tr>
+             <td class="px-4 py-2 border">${r.dataValue}</td>
+             <td class="px-4 py-2 border">${r.timestamp}</td>
+           </tr>`
+        ).join('');
+      }));
+
+      loadDevices();
+    });
+  </script>
+</body>
+</html>

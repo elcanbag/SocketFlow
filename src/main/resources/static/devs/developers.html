@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>SocketFlow Developers</title>
+</head>
+<body class="flex min-h-screen bg-gray-50">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white shadow-md h-screen sticky top-0">
+    <div class="p-6 border-b">
+      <a href="dashboard.html">
+        <h2 class="text-2xl font-semibold">SocketFlow</h2>
+      </a>
+    </div>
+    <nav class="p-4 space-y-2">
+      <a href="../dashboard.html" class="block px-4 py-2 rounded hover:bg-gray-100">See All Devices</a>
+      <a href="../dashboard.html" class="block px-4 py-2 rounded hover:bg-gray-100">Register Device</a>
+      <a href="../dashboard.html" class="block px-4 py-2 rounded hover:bg-gray-100">Latest Data</a>
+      <a href="../dashboard.html" class="block px-4 py-2 rounded hover:bg-gray-100">List Fields</a>
+      <a href="../dashboard.html" class="block px-4 py-2 rounded hover:bg-gray-100">Field Records</a>
+      <a href="../charts.html"     class="block px-4 py-2 rounded hover:bg-gray-100">Charts</a>
+      <a href="../export.html"     class="block px-4 py-2 rounded hover:bg-gray-100">Export</a>
+      <span class="block px-4 py-2 rounded bg-gray-100 font-semibold">Developers</span>
+      <a href="../about.html"      class="block px-4 py-2 rounded hover:bg-gray-100">About Us</a>
+    </nav>
+  </aside>
+
+  <!-- Content + Footer -->
+  <div class="flex-1 flex flex-col">
+    <!-- Top bar -->
+    <header class="flex items-center p-6 border-b bg-white">
+        <div class="flex-1 flex justify-center space-x-8">
+          
+          <a href="developers.html" class="text-gray-700 hover:text-indigo-600">For Developers</a>
+          <a href="../edu/education.html" class="text-gray-700 hover:text-indigo-600">Education</a>
+          <a href="env/env.html" class="text-gray-700 hover:text-indigo-600">Download SocketFlow Dev Environment</a>
+        </div>
+        <div class="flex items-center space-x-4">
+          <span id="username" class="font-semibold"></span>
+          <a href="#" id="logout" class="text-red-600 hover:text-red-800">Logout</a>
+        </div>
+      </header>
+
+    <!-- Developer Docs -->
+    <main class="flex-1 p-8 overflow-auto space-y-8">
+      <h1 class="text-3xl font-bold">API Reference</h1>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-semibold">Device Management</h2>
+
+        <div>
+          <h3 class="font-medium">POST /api/device/register</h3>
+          <p>Register a new device. Returns its <code>accessToken</code>.</p>
+          <pre class="bg-gray-100 p-4 rounded">
+Request payload:
+{
+  "deviceName": "MyDevice"
+}
+
+Response:
+{
+  "id": 42,
+  "name": "MyDevice",
+  "accessToken": "81ac1f43-56ac-45d1-a647-ac6d63332428"
+}
+          </pre>
+        </div>
+
+        <div>
+          <h3 class="font-medium">GET /api/device/all</h3>
+          <p>List all devices for the current user.</p>
+          <pre class="bg-gray-100 p-4 rounded">
+Response:
+[
+  {
+    "id": 1,
+    "name": "Device A",
+    "accessToken": "abc123"
+  },
+  {
+    "id": 2,
+    "name": "Device B",
+    "accessToken": "def456"
+  }
+]
+          </pre>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-semibold">Fields & Data</h2>
+
+        <div>
+          <h3 class="font-medium">GET /devices/{token}/fields</h3>
+          <p>Retrieve all fields defined on a device.</p>
+          <pre class="bg-gray-100 p-4 rounded">
+Response:
+[
+  { "id":1, "name":"Temperature", "type":"temperature", "unit":"°C" },
+  { "id":2, "name":"Humidity",    "type":"humidity",    "unit":"%"  }
+]
+          </pre>
+        </div>
+
+        <div>
+          <h3 class="font-medium">GET /devices/{token}/fields/latest</h3>
+          <p>Fetch the latest value for each field.</p>
+          <pre class="bg-gray-100 p-4 rounded">
+Response:
+[
+  { "fieldId":1, "dataValue":24.5, "timestamp":"2025-05-02T12:00:00" },
+  { "fieldId":2, "dataValue":58.9, "timestamp":"2025-04-28T13:00:00" }
+]
+          </pre>
+        </div>
+
+        <div>
+          <h3 class="font-medium">GET /devices/{token}/fields/{fieldId}/records</h3>
+          <p>List historical records. Optional query parameters:</p>
+          <ul class="list-disc list-inside ml-4">
+            <li><code>start=2025-01-01T00:00:00</code></li>
+            <li><code>end=2025-05-01T23:59:59</code></li>
+          </ul>
+          <pre class="bg-gray-100 p-4 rounded">
+Response:
+[
+  { "id":1, "dataValue":24.5, "timestamp":"2025-04-28T12:00:00", "fieldId":1 },
+  { "id":3, "dataValue":25.1, "timestamp":"2025-04-28T13:00:00", "fieldId":1 }
+]
+          </pre>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-semibold">Export</h2>
+      
+        <div>
+          <h3 class="font-medium">GET /api/export</h3>
+          <p>
+            Download data in 
+            <code>pdf</code>, 
+            <code>csv</code>, 
+            <code>xlsx</code>, 
+            or 
+            <code>json</code>.
+          </p>
+          <ul class="list-disc list-inside ml-4">
+            <li><code>format</code> (required)</li>
+            <li><code>accessToken</code> (required)</li>
+            <li><code>start</code> &amp; <code>end</code> (optional)</li>
+          </ul>
+          <pre class="bg-gray-100 p-4 rounded">
+      curl -u testuser:123456 \
+        "http://localhost/api/export?
+         format=pdf&amp;
+         accessToken=YOUR_TOKEN"
+          </pre>
+        </div>
+      </section>
+      
+
+
+      <section>
+        <h2 class="text-2xl font-semibold">Downloads</h2>
+        <ul>
+            <li>
+              <a href="https://drive.google.com/drive/folders/1Bb-K9YQcxDhtJxy4yFOeFBmQrBnWWscN?usp=sharing"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 class="text-blue-600 hover:underline">
+                Postman Collection(v2.1) & Swagger JSON
+              </a>
+            </li>
+          </ul>
+          
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t p-6">
+      <div class="max-w-4xl mx-auto grid grid-cols-4 gap-8 text-center">
+        <div>
+          <h4 class="font-semibold mb-2">About Us</h4>
+          <p><a href="../about.html" class="text-blue-600 hover:underline">Learn more</a></p>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-2">Contacts</h4>
+          <p>Email: <a href="mailto:info@xjyj.site" class="text-blue-600 hover:underline">info@xjyj.site</a></p>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-2">Legal</h4>
+          <p><a href="#" class="text-blue-600 hover:underline">Privacy Policy</a></p>
+          <p><a href="#" class="text-blue-600 hover:underline">Terms of Service</a></p>
+        </div>
+        <div class="flex items-center justify-center">
+          <p class="text-sm text-gray-500">Powered by SocketFlow team</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const auth = sessionStorage.getItem('auth') || '';
+      document.getElementById('username').textContent = atob(auth).split(':')[0] || '';
+      document.getElementById('logout').addEventListener('click', () => {
+        sessionStorage.removeItem('auth');
+        location.href = 'dashboard.html';
+      });
+    });
+  </script>
+</body>
+</html>

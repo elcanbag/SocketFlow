@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>SocketFlow Education</title>
+</head>
+<body class="flex min-h-screen bg-gray-50">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white shadow-md h-screen sticky top-0">
+    <div class="p-6 border-b">
+      <a href="../dashboard.html">
+        <h2 class="text-2xl font-semibold">SocketFlow</h2>
+      </a>
+    </div>
+    <nav class="p-4 space-y-2">
+      <a href="../dashboard.html" class="block px-4 py-2 rounded hover:bg-gray-100">See All Devices</a>
+      <a href="../dashboard.html" class="block px-4 py-2 rounded hover:bg-gray-100">Register Device</a>
+      <a href="../dashboard.html" class="block px-4 py-2 rounded hover:bg-gray-100">Latest Data</a>
+      <a href="../dashboard.html" class="block px-4 py-2 rounded hover:bg-gray-100">List Fields</a>
+      <a href="../dashboard.html" class="block px-4 py-2 rounded hover:bg-gray-100">Field Records</a>
+      <a href="../charts.html"   class="block px-4 py-2 rounded hover:bg-gray-100">Charts</a>
+      <a href="../export.html"   class="block px-4 py-2 rounded hover:bg-gray-100">Export</a>
+      <a href="../devs/developers.html" class="block px-4 py-2 rounded hover:bg-gray-100">Developers</a>
+      <span class="block px-4 py-2 rounded bg-gray-100 font-semibold">Education</span>
+      <a href="../about.html"    class="block px-4 py-2 rounded hover:bg-gray-100">About Us</a>
+    </nav>
+  </aside>
+
+  <!-- Content + Footer -->
+  <div class="flex-1 flex flex-col">
+    <!-- Top bar -->
+    <header class="flex items-center p-6 border-b bg-white">
+        <div class="flex-1 flex justify-center space-x-8">
+          
+          <a href="../devs/developers.html" class="text-gray-700 hover:text-indigo-600">For Developers</a>
+          <a href="education.html" class="text-gray-700 hover:text-indigo-600">Education</a>
+          <a href="../devs/env/env.html" class="text-gray-700 hover:text-indigo-600">Download SocketFlow Dev Environment</a>
+        </div>
+        <div class="flex items-center space-x-4">
+          <span id="username" class="font-semibold"></span>
+          <a href="#" id="logout" class="text-red-600 hover:text-red-800">Logout</a>
+        </div>
+      </header>
+
+    <!-- Education Content -->
+    <main class="flex-1 p-8 overflow-auto space-y-8">
+      <h1 class="text-3xl font-bold">Why SocketFlow?</h1>
+
+      <section class="space-y-4 max-w-3xl mx-auto">
+        <p>
+          <strong>SocketFlow</strong> makes real-time device telemetry 
+          and analytics simple. Instead of building your own backend 
+          and dashboards from scratch, you get:
+        </p>
+        <ul class="list-disc list-inside space-y-2 ml-4">
+          <li><strong>Zero-install Dashboard:</strong> Access your data from any browser—no client software required.</li>
+          <li><strong>Universal API:</strong> Send data from any HTTP-capable device using Basic Auth.</li>
+          <li><strong>Flexible Exports:</strong> Download PDF, CSV, Excel, or JSON, for all time or any date range.</li>
+          <li><strong>Built-in Charts:</strong> Visualize trends instantly with Chart.js integration.</li>
+          <li><strong>Secure by Default:</strong> End-to-end encryption and per-device tokens.</li>
+        </ul>
+      </section>
+
+      <section class="space-y-4 max-w-3xl mx-auto">
+        <h2 class="text-2xl font-semibold">Use Cases</h2>
+        <ul class="list-disc list-inside space-y-2 ml-4">
+          <li>IoT prototyping—connect your Arduino, Raspberry Pi, or ESP32 in minutes.</li>
+          <li>Industrial monitoring—track sensors across multiple sites securely.</li>
+          <li>Data science experiments—streamline data collection for ML workflows.</li>
+          <li>Educational projects—teach real-time analytics without complex setup.</li>
+        </ul>
+      </section>
+
+      <section class="max-w-3xl mx-auto">
+        <h2 class="text-2xl font-semibold">Get the Example Code</h2>
+        <p>
+          All of our sample scripts, integrations, and Postman collections
+          are available here:
+        </p>
+        <a href="https://drive.google.com/drive/folders/1MKWxUjaLFP2Hg9jTUKTG3-Tc3YGH175G?usp=sharing"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="text-blue-600 hover:underline">
+          Download Example Code &amp; Collections
+        </a>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t p-6">
+      <div class="max-w-4xl mx-auto grid grid-cols-4 gap-8 text-center">
+        <div>
+          <h4 class="font-semibold mb-2">About Us</h4>
+          <p><a href="../about.html" class="text-blue-600 hover:underline">Learn more</a></p>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-2">Contacts</h4>
+          <p>Email: <a href="mailto:info@xjyj.site" class="text-blue-600 hover:underline">info@xjyj.site</a></p>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-2">Legal</h4>
+          <p><a href="#" class="text-blue-600 hover:underline">Privacy Policy</a></p>
+          <p><a href="#" class="text-blue-600 hover:underline">Terms of Service</a></p>
+        </div>
+        <div class="flex items-center justify-center">
+          <p class="text-sm text-gray-500">Powered by SocketFlow team</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const auth = sessionStorage.getItem('auth') || '';
+      document.getElementById('username').textContent = atob(auth).split(':')[0] || '';
+      document.getElementById('logout').addEventListener('click', () => {
+        sessionStorage.removeItem('auth');
+        location.href = '../dashboard.html';
+      });
+    });
+  </script>
+</body>
+</html>

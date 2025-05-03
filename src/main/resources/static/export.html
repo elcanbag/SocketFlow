@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>SocketFlow Export</title>
+</head>
+<body class="flex min-h-screen bg-gray-50">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white shadow-md h-screen sticky top-0">
+    <div class="p-6 border-b">
+      <h2 class="text-2xl font-semibold">SocketFlow</h2>
+    </div>
+    <nav class="p-4 space-y-2">
+      <a href="dashboard.html" class="block px-4 py-2 rounded hover:bg-gray-100">See All Devices</a>
+      <a href="dashboard.html" class="block px-4 py-2 rounded hover:bg-gray-100">Register Device</a>
+      <a href="dashboard.html" class="block px-4 py-2 rounded hover:bg-gray-100">Latest Data</a>
+      <a href="dashboard.html" class="block px-4 py-2 rounded hover:bg-gray-100">List Fields</a>
+      <a href="dashboard.html" class="block px-4 py-2 rounded hover:bg-gray-100">Field Records</a>
+      <a href="charts.html" class="block px-4 py-2 rounded hover:bg-gray-100">Charts</a>
+      <span class="block px-4 py-2 rounded bg-gray-100 font-semibold">Export</span>
+      <a href="devs/developers.html" class="block px-4 py-2 rounded hover:bg-gray-100">Developers</a>
+      <a href="about.html"    class="block px-4 py-2 rounded hover:bg-gray-100">About Us</a>
+    </nav>
+  </aside>
+
+  <!-- Content & Footer -->
+  <div class="flex-1 flex flex-col">
+    <!-- Top bar with centered nav -->
+    <header class="flex items-center p-6 border-b bg-white">
+      <div class="flex-1 flex justify-center space-x-8">
+        
+        <a href="devs/developers.html" class="text-gray-700 hover:text-indigo-600">For Developers</a>
+        <a href="edu/education.html" class="text-gray-700 hover:text-indigo-600">Education</a>
+        <a href="devs/env/env.html" class="text-gray-700 hover:text-indigo-600">Download SocketFlow Dev Environment</a>
+      </div>
+      <div class="flex items-center space-x-4">
+        <span id="username" class="font-semibold"></span>
+        <a href="#" id="logout" class="text-red-600 hover:text-red-800">Logout</a>
+      </div>
+    </header>
+
+
+    <!-- Main -->
+    <main class="flex-1 p-8 overflow-auto">
+      <div class="max-w-xl mx-auto space-y-6">
+        <h2 class="text-3xl font-bold">Export Device Data</h2>
+        <select id="exportDevice" class="w-full px-4 py-2 border rounded"></select>
+        <select id="exportFormat" class="w-full px-4 py-2 border rounded">
+          <option value="pdf">PDF</option>
+          <option value="csv">CSV</option>
+          <option value="xlsx">Excel</option>
+          <option value="json">JSON</option>
+        </select>
+        <div class="flex items-center space-x-4">
+          <label class="inline-flex items-center">
+            <input type="radio" name="timeFilter" value="all" checked class="form-radio"/>
+            <span class="ml-2">All Time</span>
+          </label>
+          <label class="inline-flex items-center">
+            <input type="radio" name="timeFilter" value="range" class="form-radio"/>
+            <span class="ml-2">Date Range</span>
+          </label>
+        </div>
+        <div id="rangeInputs" class="flex space-x-2 hidden">
+          <input id="startDate" type="datetime-local" class="flex-1 px-4 py-2 border rounded"/>
+          <input id="endDate"   type="datetime-local" class="flex-1 px-4 py-2 border rounded"/>
+        </div>
+        <button id="btnExport" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Export</button>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t p-6">
+      <div class="max-w-4xl mx-auto grid grid-cols-4 gap-8 text-center">
+        <div>
+          <h4 class="font-semibold mb-2">About Us</h4>
+          <p><a href="about.html" class="text-blue-600 hover:underline">Learn more about SocketFlow</a></p>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-2">Contacts</h4>
+          <p>Email: <a href="mailto:info@xjyj.site" class="text-blue-600 hover:underline">info@xjyj.site</a></p>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-2">Legal</h4>
+          <p><a href="#" class="text-blue-600 hover:underline">Privacy Policy</a></p>
+          <p><a href="#" class="text-blue-600 hover:underline">Terms of Service</a></p>
+        </div>
+        <div class="flex items-center justify-center">
+          <p class="text-sm text-gray-500">Powered by SocketFlow team</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const BASE = 'http://localhost';
+      const logoutBtn = document.getElementById('logout');
+      const userSpan  = document.getElementById('username');
+      const auth      = sessionStorage.getItem('auth') || '';
+      userSpan.textContent = atob(auth).split(':')[0] || '';
+      logoutBtn.addEventListener('click', () => {
+        sessionStorage.removeItem('auth');
+        location.href = 'dashboard.html';
+      });
+
+      async function getAuthHeader() {
+        const a = sessionStorage.getItem('auth');
+        if (!a) throw new Error('Not authenticated');
+        return { 'Authorization': `Basic ${a}` };
+      }
+
+      async function fetchJson(path) {
+        const opts = { headers: await getAuthHeader() };
+        const res = await fetch(BASE + path, opts);
+        if (!res.ok) throw new Error(await res.text());
+        return res.json();
+      }
+
+      async function loadDevices() {
+        const devices = await fetchJson('/api/device/all');
+        document.getElementById('exportDevice').innerHTML =
+          devices.map(d => `<option value="${d.accessToken}">${d.name}</option>`).join('');
+      }
+
+      document.getElementsByName('timeFilter').forEach(radio => {
+        radio.addEventListener('change', () => {
+          document.getElementById('rangeInputs')
+            .classList.toggle('hidden', radio.value !== 'range');
+        });
+      });
+
+      document.getElementById('btnExport').addEventListener('click', async () => {
+        let path = `/api/export?format=${document.getElementById('exportFormat').value}` +
+                   `&accessToken=${document.getElementById('exportDevice').value}`;
+        if (document.querySelector('input[name="timeFilter"]:checked').value === 'range') {
+          const start = document.getElementById('startDate').value;
+          const end   = document.getElementById('endDate').value;
+          if (start && end) path += `&start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`;
+        }
+        const headers = await getAuthHeader();
+        const res     = await fetch(BASE + path, { headers });
+        if (!res.ok) return alert('Export failed');
+        const blob    = await res.blob();
+        const fmt     = document.getElementById('exportFormat').value;
+        const ext     = fmt === 'xlsx' ? 'xlsx' : fmt;
+        const dev     = document.getElementById('exportDevice').selectedOptions[0].text.replace(/\s+/g, '_');
+        const now     = new Date().toISOString().replace(/[:.]/g, '-');
+        const fn      = `export_${dev}_${fmt}_${now}.${ext}`;
+        const a       = document.createElement('a');
+        a.href        = URL.createObjectURL(blob);
+        a.download    = fn;
+        a.click();
+      });
+
+      loadDevices();
+    });
+  </script>
+</body>
+</html>
