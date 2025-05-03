@@ -1,0 +1,58 @@
+package com.example.cubesat.service;
+
+import com.example.cubesat.model.CubeSat;
+import com.example.cubesat.model.CubeSatRecord;
+import com.example.cubesat.repository.CubeSatRecordRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class GraphService {
+    private final CubeSatRecordRepository repository;
+
+    public Map<String, Object> getGraphDataForCubeSat(CubeSat cubeSat, LocalDateTime start, LocalDateTime end, String type) {
+        List<CubeSatRecord> records = repository.findByCubeSatAndReceivedAtBetween(cubeSat, start, end);
+
+        if (records.isEmpty()) {
+            throw new IllegalArgumentException("No data found in the given time range");
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamps", records.stream()
+                .map(r -> r.getReceivedAt().toString())
+                .collect(Collectors.toList()));
+
+        if ("temperature".equalsIgnoreCase(type)) {
+            response.put("temperature", records.stream()
+                    .map(r -> Double.parseDouble(r.getTemperature()))
+                    .collect(Collectors.toList()));
+            response.put("humidity", records.stream()
+                    .map(r -> Double.parseDouble(r.getHumidity()))
+                    .collect(Collectors.toList()));
+            response.put("pressure", records.stream()
+                    .map(r -> Double.parseDouble(r.getPressure()))
+                    .collect(Collectors.toList()));
+        } else if ("acceleration".equalsIgnoreCase(type)) {
+            response.put("x", records.stream()
+                    .map(r -> Double.parseDouble(r.getX()))
+                    .collect(Collectors.toList()));
+            response.put("y", records.stream()
+                    .map(r -> Double.parseDouble(r.getY()))
+                    .collect(Collectors.toList()));
+            response.put("z", records.stream()
+                    .map(r -> Double.parseDouble(r.getZ()))
+                    .collect(Collectors.toList()));
+        } else {
+            throw new IllegalArgumentException("Invalid graph type. Use 'temperature' or 'acceleration'.");
+        }
+
+        return response;
+    }
+}
