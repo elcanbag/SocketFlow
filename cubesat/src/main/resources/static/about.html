@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>About SocketFlow</title>
+</head>
+<body class="flex min-h-screen bg-gray-50">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white shadow-md h-screen sticky top-0">
+    <div class="p-6 border-b">
+      <h2 class="text-2xl font-semibold">SocketFlow</h2>
+    </div>
+    <nav class="p-4 space-y-2">
+      <a href="dashboard.html" class="block px-4 py-2 rounded hover:bg-gray-100">See All Devices</a>
+      <a href="dashboard.html" class="block px-4 py-2 rounded hover:bg-gray-100">Register Device</a>
+      <a href="dashboard.html" class="block px-4 py-2 rounded hover:bg-gray-100">Latest Data</a>
+      <a href="dashboard.html" class="block px-4 py-2 rounded hover:bg-gray-100">List Fields</a>
+      <a href="dashboard.html" class="block px-4 py-2 rounded hover:bg-gray-100">Field Records</a>
+      <a href="charts.html"    class="block px-4 py-2 rounded hover:bg-gray-100">Charts</a>
+      <a href="export.html"    class="block px-4 py-2 rounded hover:bg-gray-100">Export</a>
+      <span class="block px-4 py-2 rounded bg-gray-100 font-semibold">About Us</span>
+    </nav>
+  </aside>
+
+  <!-- Content & Footer -->
+  <div class="flex-1 flex flex-col">
+    <!-- Top bar -->
+    <header class="flex justify-end items-center p-6 border-b bg-white">
+      <span id="username" class="font-semibold mr-4"></span>
+      <a href="#" id="logout" class="text-red-600 hover:text-red-800">Logout</a>
+    </header>
+
+    <!-- Main content -->
+    <main class="flex-1 p-8 overflow-auto space-y-12">
+      <section class="max-w-3xl mx-auto">
+        <h1 class="text-4xl font-bold mb-4">About SocketFlow</h1>
+        <p class="mb-4">
+          Welcome to <strong>SocketFlow</strong>, your go-to platform for real-time device telemetry and analytics.
+          Designed with IoT innovators, industrial operators, and data enthusiasts in mind, SocketFlow delivers
+          seamless integration, secure data handling, and powerful visualization—all through a clean, intuitive web interface.
+        </p>
+        <p class="mb-4">
+          From registering new devices to exporting comprehensive reports, SocketFlow streamlines your end-to-end
+          workflow. Whether you’re monitoring temperature sensors in a greenhouse, tracking humidity levels in a warehouse,
+          or collecting custom metrics from your prototype hardware, SocketFlow has you covered.
+        </p>
+      </section>
+
+      <section class="max-w-3xl mx-auto">
+        <h2 class="text-2xl font-semibold mb-3">Our Mission</h2>
+        <p class="mb-4">
+          At SocketFlow, we believe data should be accessible, actionable, and above all, reliable. Our mission is
+          to empower organizations of all sizes to harness the power of real-time telemetry without the traditional
+          complexity and cost. We aim to provide a platform that’s both robust enough for enterprise deployments
+          and flexible enough for hobbyists and researchers.
+        </p>
+        <ul class="list-disc list-inside space-y-2">
+          <li><strong>Accessibility:</strong> Zero-install web dashboard, mobile-friendly design.</li>
+          <li><strong>Flexibility:</strong> Support for any device with an HTTP endpoint and Basic Auth.</li>
+          <li><strong>Scalability:</strong> From single-sensor setups to fleets of thousands, SocketFlow scales with you.</li>
+          <li><strong>Security:</strong> End-to-end encrypted communications and secure storage.</li>
+        </ul>
+      </section>
+
+      <section class="max-w-3xl mx-auto">
+        <h2 class="text-2xl font-semibold mb-3">Key Features</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-xl font-semibold mb-2">Device Management</h3>
+            <p>Register, organize, and authenticate your devices effortlessly. Each device receives a unique access token for secure communication.</p>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-xl font-semibold mb-2">Field Configuration</h3>
+            <p>Create custom fields (e.g., temperature, humidity, pressure) with unit support. Rename or reconfigure fields on the fly.</p>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-xl font-semibold mb-2">Real-Time Data</h3>
+            <p>Poll your devices every few seconds to fetch the latest telemetry. Visualize up-to-date readings in tables or charts.</p>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-xl font-semibold mb-2">Data Export</h3>
+            <p>Download full datasets or filtered ranges in PDF, CSV, Excel, or JSON. Automated naming ensures clarity and traceability.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="max-w-3xl mx-auto">
+        <h2 class="text-2xl font-semibold mb-3">Our Team</h2>
+        <p class="mb-4">
+          SocketFlow is developed and maintained by a passionate group of engineers, designers, and data scientists.
+          Our diverse backgrounds—from aerospace telemetry to consumer IoT—drive innovation and user-centric design.
+        </p>
+        <ul class="list-disc list-inside space-y-2">
+          <li><strong>Sabina Huseynzade</strong> — Frontend Architect & UX Specialist</li>
+          <li><strong>Eljan Baghirov</strong> — Lead Backend Engineer</li>
+          <li><strong>Nijat Huseynzade</strong> — DevOps & Cloud Infrastructure</li>
+        </ul>
+      </section>
+
+      <section class="max-w-3xl mx-auto">
+        <h2 class="text-2xl font-semibold mb-3">Technology Stack</h2>
+        <p class="mb-4">
+          SocketFlow leverages modern, battle-tested technologies to ensure reliability and performance:
+        </p>
+        <ul class="list-disc list-inside space-y-2">
+          <li><strong>Backend:</strong> Spring Boot (Java), PostgreSQL</li>
+          <li><strong>Frontend:</strong> Tailwind CSS, Vanilla JS, Chart.js</li>
+          <li><strong>Authentication:</strong> HTTP Basic Auth & JSON Web Tokens (planned)</li>
+          <li><strong>Hosting:</strong> Containerized Docker deployments, Kubernetes–ready</li>
+        </ul>
+      </section>
+
+      <section class="max-w-3xl mx-auto">
+        <h2 class="text-2xl font-semibold mb-3">Get In Touch</h2>
+        <p>
+          We’re here to help! For support, feature requests, or partnership inquiries, drop us a line:
+        </p>
+        <p class="mt-2"><strong>Email:</strong> <a href="mailto:info@xjyj.site" class="text-blue-600 hover:underline">info@xjyj.site</a></p>
+        <p class="mt-2"><strong>GitHub:</strong> <a href="https://github.com/elcanbag/SocketFlow" target="_blank" class="text-blue-600 hover:underline">github.com/elcanbag/SocketFlow</a></p>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t p-6">
+      <div class="max-w-4xl mx-auto grid grid-cols-4 gap-8 text-center">
+        <div>
+          <h4 class="font-semibold mb-2">About Us</h4>
+          <p><a href="about.html" class="text-blue-600 hover:underline">Learn more about SocketFlow</a></p>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-2">Contacts</h4>
+          <p>Email: <a href="mailto:info@xjyj.site" class="text-blue-600 hover:underline">info@xjyj.site</a></p>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-2">Legal</h4>
+          <p><a href="#" class="text-blue-600 hover:underline">Privacy Policy</a></p>
+          <p><a href="#" class="text-blue-600 hover:underline">Terms of Service</a></p>
+        </div>
+        <div class="flex items-center justify-center">
+          <p class="text-sm text-gray-500">Powered by SocketFlow team</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const username = atob(sessionStorage.getItem('auth')||'').split(':')[0] || '';
+      document.getElementById('username').textContent = username;
+      document.getElementById('logout')
+        .addEventListener('click', () => {
+          sessionStorage.removeItem('auth');
+          window.location.href = 'dashboard.html';
+        });
+    });
+  </script>
+</body>
+</html>
