@@ -111,7 +111,7 @@ public class SecurityConfig {
             if (!u.isVerified()) {
                 throw new BadCredentialsException("Account not verified");
             }
-            // Spring Security UserDetails örneği
+
             return org.springframework.security.core.userdetails.User
                     .withUsername(u.getUsername())
                     .password(u.getPassword())
